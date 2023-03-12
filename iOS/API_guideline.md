@@ -3,10 +3,10 @@
 1. 사용할 때 명확하게 느끼는 것이 **가장** 중요합니다.
 2. 명확한 것 > 간결한 것 
     ```swift
-        let blackButton (O)
-        let blackBtn (x)
+        let blackButton (👍)
+        let blackBtn  (👎)
     ```
-3.  모든 선언에 대해 문서 주석(Documentation Comment)를 작성해 주세요
+3.  모든 선언에 대해 **문서 주석(Documentation Comment)** 를 작성해 주세요
      ```swift
     /// Writes the textual representation of each  
     /// element of `items` to the standard output.
@@ -95,17 +95,118 @@
 <br/>
 
 ## Strive for Fluent Usage
+1. method와 function을 영어 문장처럼 사용할 수 있도록 하기
+    ```swift
+    ///Good(👍)
+        x.insert(y, at: z)          “x, insert y at z”
+        x.subViews(havingColor: y)  “x's subviews having color y”
+        x.capitalizingNouns()       “x, capitalizing nouns”
 
 
+     ///Bad(👎)
+        x.insert(y, position: z)
+        x.subViews(color: y)
+        x.nounCapitalize()
+    ```
 
-
-
-
-
-
-## Use Terminology Well
-
+    예외) 첫번째 또는 두번째 argument 이후에 주요 argument가 아닌 경우에는 유창함이 떨어지는 것이 허용됩니다.
 
     ```swift
-    
+       AudioUnit.instantiate(
+            with: description, 
+            options: [.inProcess], completionHandler: stopProgressBar) 
     ```
+
+2. factory method의 시작은 make로 시작합니다.
+   ```swift
+    struct List {
+        func makeIterator() -> IteratorProtocol {
+            Iterator(self)
+        }
+    }
+
+    x.makeIterator()
+
+   ```
+3. initializer의 argument와 factory method 호출에는 경로로 시작하는 구절로 구성하지 마세요
+    ```swift
+    ///Good(👍)
+        ///#1
+        struct Color {
+            init(red: Int, green: Int, blue: Int) {}
+            func makeWidget(havingGearCount: Int, andSpindleCount: Int) -> Widget{ Widget() }
+        }
+        let foreground = Color(red: 32, green: 64, blue: 128)
+        let newPart = factory.makeWidget(gears: 42, spindles: 14)
+
+        ///#2
+        struct Link {
+            init(target: Destination) {}
+        }
+        let ref = Link(target: destination)
+
+        ///#3
+        struct RGBColor{
+            init(_ cmykColor: CMYKColor) {}
+        }
+        let rgbColor = RGBColor(cmykColor)
+
+
+     ///Bad(👎)
+         ///#1
+       struct Color {
+            init(havingRed red: Int, green: Int, and Blue: Int) {}
+            func makeWidget(havingGearCount: Int, andSpindleCount: Int) -> Widget { Widget() }
+       }
+       let foreground = Color(havingRGBValuesRed: 32, green: 64, andBlue: 128)
+       let newPart = factory.makeWidget(havingGearCount: 42, andSpindleCount: 14)
+
+        ///#2
+       struct Link {
+            init(to target: Destination) {}
+       }
+       let ref = Link(to: destination)
+
+    ```
+
+4. 부수효과(side-effect)를 기반해서 function 과 method의 네이밍을 하세요.
+   - side-effect가 없는 것은 명사로 읽혀야 함. e.g.) x.distance(to:y), i.successor()
+   - side-effect가 있는 것은 동사로 읽혀야 함 e.g.) print(x), x.sort(), x.append(y)
+   - mutating/nonmutating method의 이름을 일관성 있게 짓기. 
+     - operation이 동사로 설명되는 경우: mutating에는 동사의 명령형(sort(), append())을 사용, nonmutating에는 'ed', 'ing'를 접미사로 붙여서(sorted(), appending()) 사용함
+   - operation이 명사로 설명되는 경우: mutating에는 form접두사 붙여서 사용(formUnion, formSuccessor), nonmutating에는 명사 활용(union, successor)
+
+5. nonmutating인 Boolean 메소드와 프로퍼티는 호출되는 객체에 대한 주장문처럼 읽혀야 한다
+   ```swift
+    x.isEmpty , line1.intersects(line2)
+   ```
+6. 어떤 것이 무엇인지를 설명하는 프로토콜은 명사로 읽혀야 합니다
+     ```swift
+    Collection
+   ```
+7. 능력을 설명하는 프로토콜은 able, ible, ing를 사용한 접미사로 네이밍해야 합니다
+    ```swift
+    Equatable , ProgressReporting
+
+    protocol ProgressReporting{}
+
+    extension ProgressReporting{
+        func reportProgress() {
+        }
+    }
+   ```
+8. 나머지 types, properties, variables, constants는 명사로 읽혀야 합니다
+
+
+<br/>
+
+## Use Terminology Well
+1. 일반적인 단어가 의미를 더 잘 전달한다면 잘 알려져 있지 않은 용어를 사용하지 마세요.
+2. 전문 용어를 사용한다면 **대중에게 인정받는 정의** 를 사용하세요.
+3. **약어(줄임말, abbreviations)을 피하세요**
+4. 관례를 따르세요.
+
+
+## 참고
+- 공식 문서: https://www.swift.org/documentation/api-design-guidelines/
+- 번역본: https://cozzin.gitbook.io/swift-api-design-guidelines/naming/strive-for-fluent-usage
